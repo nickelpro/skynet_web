@@ -120,7 +120,7 @@ class player_handler(base_handler):
 				sql+=' AND '+self.argsql[key]
 				params.append(value)
 		try:
-			self.cur.execute(sql+";", params)
+			self.cur.execute(sql+"ORDER BY time ASC;", params)
 		except psycopg2.DataError:
 			self.conn.rollback()
 			return "Incorrectly formatted request"
