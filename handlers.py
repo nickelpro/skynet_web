@@ -69,6 +69,7 @@ class event_handler(base_handler):
 		try:
 			self.cur.execute(sql+";", params)
 		except psycopg2.DataError:
+			self.conn.rollback()
 			return "Incorrectly formatted request"
 
 		data = self.cur.fetchall()
@@ -121,6 +122,7 @@ class player_handler(base_handler):
 		try:
 			self.cur.execute(sql+";", params)
 		except psycopg2.DataError:
+			self.conn.rollback()
 			return "Incorrectly formatted request"
 		
 		data = self.cur.fetchall()
@@ -161,6 +163,7 @@ class time_handler(base_handler):
 		try:
 			self.cur.execute(sql, params)
 		except psycopg2.DataError:
+			self.conn.rollback()
 			return "Incorrectly formatted request"
 
 		data = self.cur.fetchall()
