@@ -21,10 +21,17 @@ returntypes = {
 	'xml': xmldump,
 }
 
+ctypes = {
+	'json': 'application/json'
+	'yml': 'text/x-yaml:'
+	'xml': 'application/xml'
+}
+
 class category_handler:
 	def GET(self, category, returntype='json'):
 		args = web.input()
 		if category in categories and returntype in returntypes:
+			web.header('Content-Type', ctypes[returntype])
 			return returntypes[returntype](categories[category].handle_category(args))
 		else:
 			return web.NotFound()
