@@ -1,8 +1,7 @@
-import web
-import json
-import psycopg2
-import pytz
-import datetime
+#Depends on web.py, psycopg2, PyYaml, pytz
+import web, psycopg2
+import json, yaml, xmlrpclib
+import datetime, pytz
 from dblogin import dbname, dbuser, dbpass
 
 categories = {}
@@ -14,7 +13,9 @@ def cat_handler(category):
 	return inner
 
 returntypes = {
-	'json': json.dumps
+	'json': json.dumps,
+	'yml': yaml.dump,
+	'xml': xmlrpclib.dumps,
 }
 
 class category_handler:
