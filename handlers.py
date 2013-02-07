@@ -18,7 +18,7 @@ returntypes = {
 }
 
 class category_handler:
-	def GET(self, category, returntype):
+	def GET(self, category, returntype='json'):
 		args = web.input()
 		if category in categories and returntype in returntypes:
 			return returntypes[returntype](categories[category].handle_category(args))
@@ -26,7 +26,7 @@ class category_handler:
 			return web.NotFound()
 
 class object_handler:
-	def GET(self, category, obj, returntype):
+	def GET(self, category, obj, returntype='json'):
 		args = web.input()
 		if category in categories and returntype in returntypes:
 			return returntypes[returntype](categories[category].handle_object(obj, args))

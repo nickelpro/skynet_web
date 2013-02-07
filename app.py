@@ -7,7 +7,9 @@ class hello:
 
 mapping = (
 	('/', 'hello'), 
+	('/([a-zA-Z0-9_]*)', 'category_handler'),
 	('/([a-zA-Z0-9_]*)\.([a-zA-Z0-9_]*)', 'category_handler'),
+	('/([a-zA-Z0-9_]*)/([a-zA-Z0-9_]*)', 'object_handler'),
 	('/([a-zA-Z0-9_]*)/([a-zA-Z0-9_]*)\.([a-zA-Z0-9_]*)', 'object_handler'),
 	)
 
