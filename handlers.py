@@ -13,7 +13,7 @@ def cat_handler(category):
 	return inner
 
 def xmldump(params):
-	xmlrpclib.dumps(tuple(params))
+	return xmlrpclib.dumps(tuple(params))
 
 returntypes = {
 	'json': json.dumps,
