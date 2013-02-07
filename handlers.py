@@ -145,7 +145,7 @@ class player_handler(base_handler):
 				})
 		return toreturn
 
-@cat_handler('time')
+@cat_handler('times')
 class time_handler(base_handler):
 	@classmethod
 	def handle_category(self, args):
