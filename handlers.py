@@ -49,7 +49,7 @@ class event_handler(base_handler):
 		'from': 'time>=%s',
 		'until': 'time<=%s',
 		'player': 'LOWER(player_name)=LOWER(%s)',
-		'online': 'online=',
+		'online': 'online=%s',
 	}
 	@classmethod
 	def handle_category(self, args):
@@ -94,7 +94,6 @@ class event_handler(base_handler):
 			'time': str(data[3]),
 		}
 
-
 @cat_handler('players')
 class player_handler(base_handler):
 	argsql = {
@@ -138,7 +137,6 @@ class player_handler(base_handler):
 					'login_time': str(field[3]),
 					'online_time': str(time),
 				})
-
 		return toreturn
 
 @cat_handler('time')
@@ -164,6 +162,7 @@ class time_handler(base_handler):
 			self.cur.execute(sql, params)
 		except psycopg2.DataError:
 			return "Incorrectly formatted request"
+
 		data = self.cur.fetchall()
 		toreturn = {}
 		for field in data:
