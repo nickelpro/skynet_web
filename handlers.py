@@ -12,10 +12,13 @@ def cat_handler(category):
 		return cl
 	return inner
 
+def xmldump(params):
+	xmlrpclib.dumps((params))
+
 returntypes = {
 	'json': json.dumps,
 	'yml': yaml.dump,
-	'xml': xmlrpclib.dumps,
+	'xml': xmldump,
 }
 
 class category_handler:
