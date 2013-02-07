@@ -22,9 +22,9 @@ returntypes = {
 }
 
 ctypes = {
-	'json': 'application/json'
-	'yml': 'text/x-yaml:'
-	'xml': 'application/xml'
+	'json': 'application/json',
+	'yml': 'text/x-yaml:',
+	'xml': 'application/xml',
 }
 
 class category_handler:
