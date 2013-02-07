@@ -131,7 +131,7 @@ class player_handler(base_handler):
 				sql+=' AND '+self.argsql[key]
 				params.append(value)
 		try:
-			self.cur.execute(sql+"ORDER BY time ASC;", params)
+			self.cur.execute(sql+";", params)
 		except psycopg2.Error, e:
 			self.conn.rollback()
 			return e.pgerror
