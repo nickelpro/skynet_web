@@ -131,10 +131,10 @@ class player_handler(base_handler):
 		for index, field in enumerate(data):
 			if field[2]:
 				index+=1
-				while data[index][2] and index<=length:
+				while data[index][2] and index<length:
 					data.pop(index)
 					length-=1
-				time = (data[index][3] - field[3]) if index<=length else (datetime.datetime(pytz.utc)-field[3])
+				time = (data[index][3] - field[3]) if index<length else (datetime.datetime(pytz.utc)-field[3])
 				toreturn.append({
 					'login_time': str(field[3]),
 					'online_time': str(time),
