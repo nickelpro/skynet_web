@@ -68,9 +68,9 @@ class event_handler(base_handler):
 					first = False
 		try:
 			self.cur.execute(sql+";", params)
-		except psycopg2.DataError:
+		except psycopg2.Error, e:
 			self.conn.rollback()
-			return "Incorrectly formatted request"
+			return e.pgerror
 
 		data = self.cur.fetchall()
 		toreturn = []
@@ -121,9 +121,9 @@ class player_handler(base_handler):
 				params.append(value)
 		try:
 			self.cur.execute(sql+"ORDER BY time ASC;", params)
-		except psycopg2.DataError:
+		except psycopg2.Error, e:
 			self.conn.rollback()
-			return "Incorrectly formatted request"
+			return e.pgerror
 		
 		data = self.cur.fetchall()
 		toreturn = []
@@ -162,9 +162,9 @@ class time_handler(base_handler):
 				ON (se1.player_name = se2.player_name AND se1.time = se2.time AND se1.online = True);"""
 		try:
 			self.cur.execute(sql, params)
-		except psycopg2.DataError:
+		except psycopg2.Error, e:
 			self.conn.rollback()
-			return "Incorrectly formatted request"
+			return e.pgerror
 
 		data = self.cur.fetchall()
 		toreturn = {}
