@@ -177,5 +177,5 @@ class time_handler(base_handler):
 		data = self.cur.fetchall()
 		toreturn = {}
 		for field in data:
-			toreturn[field[0]]=field[1].isoformat()
+			toreturn[field[1]]=field[0].isoformat()
 		return toreturn
