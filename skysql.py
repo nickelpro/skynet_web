@@ -22,7 +22,7 @@ online_now =  """
 									GROUP BY player_name) se2
 									INNER JOIN (
 										SELECT player_name FROM online_players
-									) se4
+									) AS se4
 								ON (se2.player_name = se4.player_name)
 							)
 						) se5
