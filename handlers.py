@@ -24,7 +24,7 @@ returntypes = {
 
 ctypes = {
 	'json': 'application/json',
-	'yml': 'text/x-yaml:',
+	'yml': 'text/x-yaml',
 	'xml': 'application/xml',
 }
 
