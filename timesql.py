@@ -1,4 +1,4 @@
-time_at =  """
+time_now =  """
 			WITH online_players AS (
 					SELECT se1.player_name, se1.time, se1.online FROM skynet_events se1 
 						INNER JOIN (
@@ -35,7 +35,7 @@ time_at =  """
 			)
 				SELECT MIN(time) AS time, player_name FROM yaw GROUP BY player_name;
 			"""
-time_now = """
+time_at = """
 			WITH at_time AS (
 					SELECT time, player_name, online FROM skynet_events WHERE time<=%s
 			),
