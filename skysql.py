@@ -78,3 +78,4 @@ online_at = """
 					ON (se2.player_name = se5.player_name)
 			)
 				SELECT MIN(time) AS time, player_name FROM yaw GROUP BY player_name;
+			"""
