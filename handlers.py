@@ -41,6 +41,7 @@ class object_handler:
 	def GET(self, category, obj, returntype='json'):
 		args = web.input()
 		if category in categories and returntype in returntypes:
+			web.header('Content-Type', ctypes[returntype])
 			return returntypes[returntype](categories[category].handle_object(obj, args))
 		else:
 			return web.NotFound()
