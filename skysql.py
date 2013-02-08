@@ -1,6 +1,5 @@
 # Stupid complex SQL because edge cases make it very hard to accurately
-# retrieve the time someone logged in. This gets pretty close and I'll
-# be cleaning it up over the next couple days.
+# retrieve the time someone logged in. This gets pretty close
 online_now =  """
 			--Find which players are online
 			WITH online_players AS (
@@ -11,33 +10,30 @@ online_now =  """
 						) se2
 					ON (se1.player_name = se2.player_name AND se1.time = se2.time AND se1.online = True)
 			),
-			--Get the log in times
+			--Get the log in times based on last logout
 				log_in AS (
 					SELECT se1.time, se1.player_name FROM skynet_events se1
 						INNER JOIN (
-							SELECT player_name, time FROM (
-								SELECT se2.player_name, se2.time FROM (
-									SELECT MAX(se3.time) AS time, se3.player_name FROM (
-										SELECT time, player_name, online FROM skynet_events WHERE online = False) se3
-									GROUP BY player_name) se2
-									INNER JOIN (
-										SELECT player_name FROM online_players
-									) AS se4
-								ON (se2.player_name = se4.player_name)
-							)
+							SELECT se2.player_name AS player_name, se2.time AS time FROM (
+								SELECT MAX(se3.time) AS time, se3.player_name FROM (
+									SELECT time, player_name, online FROM skynet_events WHERE online = False) se3
+								GROUP BY player_name) se2
+								INNER JOIN (
+									SELECT player_name FROM online_players
+								) se4
+							ON (se2.player_name = se4.player_name)
 						) se5
 					ON (se1.player_name = se5.player_name) WHERE se1.time>se5.time
-			),
-			--Yet Another With clause, grabs players who have never logged before
-				yaw AS (
-					SELECT se1.player_name, se1.time FROM log_in se1
-					UNION SELECT se2.player_name, se2.time FROM skynet_events se2
-						INNER JOIN (
-							SELECT se3.player_name FROM online_players se3
-								EXCEPT SELECT se4.player_name FROM online_log se4) se5
-					ON (se2.player_name = se5.player_name)
 			)
-				SELECT MIN(time) AS time, player_name FROM yaw GROUP BY player_name;
+			--Grabs all the logins including players who have never logged out before
+				SELECT MIN(se1.time) AS time, se1.player_name FROM (
+					SELECT se2.player_name as player_name, se2.time as time FROM log_in se2
+					UNION SELECT se3.player_name, se3.time FROM skynet_events se3
+						INNER JOIN (
+							SELECT se4.player_name FROM online_players se4
+								EXCEPT SELECT se5.player_name FROM log_in se5) se6
+					ON (se3.player_name = se6.player_name)
+					) se1 GROUP BY player_name;
 			"""
 
 online_at = """
@@ -52,30 +48,26 @@ online_at = """
 						) se2
 					ON (se1.player_name = se2.player_name AND se1.time = se2.time AND se1.online = True)
 			),
-				online_log AS (
-					SELECT se1.player_name, se1.time FROM (
-						SELECT MAX(se3.time) AS time, se3.player_name FROM (
-							SELECT time, player_name, online FROM at_time WHERE online = False) se3
-						GROUP BY player_name) se1
-						INNER JOIN (
-							SELECT player_name FROM online_players
-						) se2
-					ON (se1.player_name = se2.player_name)
-			),
 				log_in AS (
 					SELECT se1.time, se1.player_name FROM at_time se1
 						INNER JOIN (
-							SELECT player_name, time FROM online_log
-						) se2
-					ON (se1.player_name = se2.player_name) WHERE se1.time>se2.time
-			),
-				yaw AS (
-					SELECT se1.player_name, se1.time FROM log_in se1
-					UNION SELECT se2.player_name, se2.time FROM at_time se2
-						INNER JOIN (
-							SELECT se3.player_name FROM online_players se3
-								EXCEPT SELECT se4.player_name FROM online_log se4) se5
-					ON (se2.player_name = se5.player_name)
+							SELECT se2.player_name AS player_name, se2.time AS time FROM (
+								SELECT MAX(se3.time) AS time, se3.player_name FROM (
+									SELECT time, player_name, online FROM at_time WHERE online = False) se3
+								GROUP BY player_name) se2
+								INNER JOIN (
+									SELECT player_name FROM online_players
+								) se4
+							ON (se2.player_name = se4.player_name)
+						) se5
+					ON (se1.player_name = se5.player_name) WHERE se1.time>se5.time
 			)
-				SELECT MIN(time) AS time, player_name FROM yaw GROUP BY player_name;
+				SELECT MIN(se1.time) AS time, se1.player_name FROM (
+					SELECT se2.player_name as player_name, se2.time as time FROM log_in se2
+					UNION SELECT se3.player_name, se3.time FROM at_time se3
+						INNER JOIN (
+							SELECT se4.player_name FROM online_players se4
+								EXCEPT SELECT se5.player_name FROM log_in se5) se6
+					ON (se3.player_name = se6.player_name)
+					) se1 GROUP BY player_name;
 			"""
