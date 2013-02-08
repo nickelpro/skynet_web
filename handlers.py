@@ -1,7 +1,8 @@
-#Depends on web.py, psycopg2, PyYaml, pytz
+#Depends on web.py, psycopg2, PyYaml, pytz, python-dateutil
 import web, psycopg2
 import json, yaml, xmlrpclib
 import datetime, pytz
+from dateutil.parser import parse as datetimeparse
 from dblogin import dbname, dbuser, dbpass
 
 categories = {}
@@ -90,7 +91,7 @@ class event_handler(base_handler):
 				'id':field[0],
 				'player': field[1],
 				'online': field[2],
-				'time': str(field[3]),
+				'time': field[3].isoformat(),
 				})
 		return toreturn
 
@@ -103,14 +104,13 @@ class event_handler(base_handler):
 			'id':data[0],
 			'player':data[1],
 			'online':data[2],
-			'time': str(data[3]),
+			'time': data[3].isoformat(),
 		}
 
 @cat_handler('players')
 class player_handler(base_handler):
 	argsql = {
 		'from': 'time>=%s',
-		'until': 'time<=%s',
 	}
 	@classmethod
 	def handle_category(self, args):
@@ -131,7 +131,7 @@ class player_handler(base_handler):
 				sql+=' AND '+self.argsql[key]
 				params.append(value)
 		try:
-			self.cur.execute(sql+";", params)
+			self.cur.execute(sql+"ORDER BY time ASC;", params)
 		except psycopg2.Error, e:
 			self.conn.rollback()
 			return e.pgerror
@@ -146,10 +146,14 @@ class player_handler(base_handler):
 					data.pop(index)
 					length-=1
 				time = (data[index][3] - field[3]) if index<=length else (datetime.datetime.now(pytz.utc)-field[3])
-				toreturn.append({
-					'login_time': str(field[3]),
-					'online_time': str(time),
-				})
+				try:
+					if not 'until' in args or datetimeparse(args['until'])>=field[3]:
+						toreturn.append({
+							'login_time': field[3].isoformat(),
+							'online_time': time.isoformat(),
+						})
+				except ValueError, e:
+					return e
 		return toreturn
 
 @cat_handler('times')
@@ -180,5 +184,5 @@ class time_handler(base_handler):
 		data = self.cur.fetchall()
 		toreturn = {}
 		for field in data:
-			toreturn[field[0]]=str(field[1])
+			toreturn[field[0]]=field[1].isoformat()
 		return toreturn
