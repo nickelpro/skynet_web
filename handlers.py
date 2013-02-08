@@ -100,7 +100,11 @@ class event_handler(base_handler):
 	@classmethod
 	def handle_object(self, eventid, args):
 		sql = 'SELECT * FROM skynet_events WHERE id=%s;'
-		self.cur.execute(sql, (eventid,))
+		try:
+			self.cur.execute(sql, (eventid,))
+		except psycopg2.Error, e:
+			self.conn.rollback()
+			return e.pgerror
 		data = self.cur.fetchall()[0]
 		return {
 			'id':data[0],
@@ -111,13 +115,14 @@ class event_handler(base_handler):
 
 @cat_handler('players')
 class player_handler(base_handler):
-	argsql = {
-		'from': 'time>=%s',
-	}
 	@classmethod
 	def handle_category(self, args):
 		sql = 'SELECT DISTINCT player_name from skynet_events;'
-		self.cur.execute(sql)
+		try:
+			self.cur.execute(sql)
+		except psycopg2.Error, e:
+			self.conn.rollback()
+			return e.pgerror
 		data = self.cur.fetchall()
 		toreturn = []
 		for field in data:
@@ -126,14 +131,9 @@ class player_handler(base_handler):
 
 	@classmethod
 	def handle_object(self, player, args):
-		sql = 'SELECT * FROM skynet_events WHERE LOWER(player_name)=LOWER(%s)'
-		params = [player,]
-		for key, value in args.iteritems():
-			if key in self.argsql:
-				sql+=' AND '+self.argsql[key]
-				params.append(value)
+		sql = 'SELECT * FROM skynet_events WHERE LOWER(player_name)=LOWER(%s) ORDER BY time ASC;'
 		try:
-			self.cur.execute(sql+"ORDER BY time ASC;", params)
+			self.cur.execute(sql, (player,))
 		except psycopg2.Error, e:
 			self.conn.rollback()
 			return e.pgerror
@@ -150,10 +150,11 @@ class player_handler(base_handler):
 				time = (data[index][3] - field[3]) if index<=length else (datetime.datetime.now(pytz.utc)-field[3])
 				try:
 					if not 'until' in args or datetimeparse(args['until'])>=field[3]:
-						toreturn.append({
-							'login_time': field[3].isoformat(),
-							'online_time': str(time),
-						})
+						if not 'from' in args or datetimeparse(args['from'])<=field[3]:
+							toreturn.append({
+								'login_time': field[3].isoformat(),
+								'online_time': str(time),
+							})
 				except ValueError, e:
 					return str(e)
 		return toreturn
