@@ -34,7 +34,11 @@ online_now =  """
 			--Yet Another With clause, this still bugs on edge cases
 				yaw AS (
 					SELECT se1.player_name, se1.time FROM log_in se1
-					UNION SELECT se2.player_name, se2.time FROM online_players se2 
+					UNION SELECT se2.player_name, se2.time FROM skynet_events se2
+						INNER JOIN (
+							SELECT se3.player_name FROM online_players se3
+								EXCEPT SELECT se4.player_name FROM online_log se4) se5
+					ON (se2.player_name = se5.player_name)
 			)
 				SELECT MIN(time) AS time, player_name FROM yaw GROUP BY player_name;
 			"""
