@@ -33,7 +33,7 @@ online_now =  """
 							SELECT se4.player_name FROM online_players se4
 								EXCEPT SELECT se5.player_name FROM log_in se5) se6
 					ON (se3.player_name = se6.player_name)
-					) se1 GROUP BY player_name;
+				) se1 GROUP BY player_name;
 			"""
 
 online_at = """
@@ -69,5 +69,5 @@ online_at = """
 							SELECT se4.player_name FROM online_players se4
 								EXCEPT SELECT se5.player_name FROM log_in se5) se6
 					ON (se3.player_name = se6.player_name)
-					) se1 GROUP BY player_name;
+				) se1 GROUP BY player_name;
 			"""
