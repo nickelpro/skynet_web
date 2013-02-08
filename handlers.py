@@ -58,7 +58,7 @@ class base_handler:
 		return web.NotFound()
 
 @cat_handler('events')
-class event_handler(base_handler):
+class events_handler(base_handler):
 	argsql = {
 		'from': 'time>=%s',
 		'until': 'time<=%s',
@@ -114,7 +114,7 @@ class event_handler(base_handler):
 		}
 
 @cat_handler('players')
-class player_handler(base_handler):
+class players_handler(base_handler):
 	@classmethod
 	def handle_category(self, args):
 		sql = 'SELECT DISTINCT player_name from skynet_events;'
@@ -160,7 +160,7 @@ class player_handler(base_handler):
 		return toreturn
 
 @cat_handler('online')
-class time_handler(base_handler):
+class online_handler(base_handler):
 	@classmethod
 	def handle_category(self, args):
 		params = []
