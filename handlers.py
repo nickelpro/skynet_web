@@ -2,6 +2,7 @@
 import web, psycopg2
 import json, yaml, xmlrpclib
 import datetime, pytz
+import timesql
 from dateutil.parser import parse as datetimeparse
 from dblogin import dbname, dbuser, dbpass
 
@@ -163,19 +164,10 @@ class time_handler(base_handler):
 	def handle_category(self, args):
 		params = []
 		if 'at' in args:
-			sql = """SELECT se1.player_name, se1.time, se1.online FROM skynet_events se1 
-				INNER JOIN (
-					SELECT MAX(se3.time) AS time, se3.player_name AS player_name FROM (
-						SELECT time, player_name FROM skynet_events WHERE time<=%s) se3
-					GROUP BY player_name) se2
-				ON (se1.player_name = se2.player_name AND se1.time = se2.time AND se1.online = True);"""
+			sql = timesql.time_at
 			params.append(args['at'])
 		else:
-			sql = """SELECT se1.player_name, se1.time, se1.online FROM skynet_events se1 
-				INNER JOIN (
-					SELECT MAX(time) AS time, player_name FROM skynet_events
-					GROUP BY player_name) se2
-				ON (se1.player_name = se2.player_name AND se1.time = se2.time AND se1.online = True);"""
+			sql = timesql.time_now
 		try:
 			self.cur.execute(sql, params)
 		except psycopg2.Error, e:
