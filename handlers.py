@@ -153,7 +153,7 @@ class player_handler(base_handler):
 							'online_time': str(time),
 						})
 				except ValueError, e:
-					return e
+					return str(e)
 		return toreturn
 
 @cat_handler('times')
