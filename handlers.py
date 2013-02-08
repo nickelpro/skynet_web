@@ -150,7 +150,7 @@ class player_handler(base_handler):
 					if not 'until' in args or datetimeparse(args['until'])>=field[3]:
 						toreturn.append({
 							'login_time': field[3].isoformat(),
-							'online_time': time.isoformat(),
+							'online_time': str(time),
 						})
 				except ValueError, e:
 					return e
