@@ -2,7 +2,7 @@
 import web, psycopg2
 import json, yaml, xmlrpclib
 import datetime, pytz
-import timesql
+import skysql
 from dateutil.parser import parse as datetimeparse
 from dblogin import dbname, dbuser, dbpass
 
@@ -158,16 +158,16 @@ class player_handler(base_handler):
 					return str(e)
 		return toreturn
 
-@cat_handler('times')
+@cat_handler('online')
 class time_handler(base_handler):
 	@classmethod
 	def handle_category(self, args):
 		params = []
 		if 'at' in args:
-			sql = timesql.time_at
+			sql = skysql.online_at
 			params.append(args['at'])
 		else:
-			sql = timesql.time_now
+			sql = skysql.online_now
 		try:
 			self.cur.execute(sql, params)
 		except psycopg2.Error, e:
