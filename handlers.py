@@ -110,7 +110,7 @@ class events_handler(base_handler):
 			self.conn.rollback()
 			return e.pgerror
 
-		data = self.cur.fetchall()[0]
+		data = cur.fetchall()[0]
 		cur.close()
 		return {
 			'id':data[0],
@@ -126,7 +126,7 @@ class players_handler(base_handler):
 		cur = self.conn.cursor()
 		sql = 'SELECT DISTINCT player_name FROM skynet_events;'
 		try:
-			self.cur.execute(sql)
+			cur.execute(sql)
 		except psycopg2.Error, e:
 			cur.close()
 			self.conn.rollback()
@@ -203,13 +203,13 @@ class online_handler(base_handler):
 		else:
 			sql = skysql.online_now
 		try:
-			self.cur.execute(sql, params)
+			cur.execute(sql, params)
 		except psycopg2.Error, e:
 			cur.close()
 			self.conn.rollback()
 			return e.pgerror
 
-		data = self.cur.fetchall()
+		data = cur.fetchall()
 		cur.close()
 		toreturn = {}
 		for field in data:
