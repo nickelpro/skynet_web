@@ -160,9 +160,6 @@ class players_handler(base_handler):
 					return str(e)
 		return toreturn
 
-@cat_handler('times')
-class
-
 @cat_handler('online')
 class online_handler(base_handler):
 	argsql = {
