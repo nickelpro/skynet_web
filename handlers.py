@@ -49,7 +49,6 @@ class object_handler:
 
 class base_handler:
 	conn = psycopg2.connect(database=dbname, user=dbuser, password=dbpass)
-	cur = conn.cursor()
 	@classmethod
 	def handle_category(self, args):
 		return web.NotFound()
@@ -67,6 +66,7 @@ class events_handler(base_handler):
 	}
 	@classmethod
 	def handle_category(self, args):
+		cur = self.conn.cursor()
 		#I don't know how to SQL, this is my attempt at a dynamic query
 		sql = 'SELECT * FROM skynet_events'
 		first = True
@@ -81,12 +81,14 @@ class events_handler(base_handler):
 					params.append(value)
 					first = False
 		try:
-			self.cur.execute(sql+";", params)
+			cur.execute(sql+";", params)
 		except psycopg2.Error, e:
+			cur.close()
 			self.conn.rollback()
 			return e.pgerror
 
-		data = self.cur.fetchall()
+		data = cur.fetchall()
+		cur.close()
 		toreturn = []
 		for field in data:
 			toreturn.append({
@@ -99,13 +101,17 @@ class events_handler(base_handler):
 
 	@classmethod
 	def handle_object(self, eventid, args):
+		cur = self.conn.cursor()
 		sql = 'SELECT * FROM skynet_events WHERE id=%s;'
 		try:
-			self.cur.execute(sql, (eventid,))
+			cur.execute(sql, (eventid,))
 		except psycopg2.Error, e:
+			cur.close()
 			self.conn.rollback()
 			return e.pgerror
+
 		data = self.cur.fetchall()[0]
+		cur.close()
 		return {
 			'id':data[0],
 			'player':data[1],
@@ -117,13 +123,17 @@ class events_handler(base_handler):
 class players_handler(base_handler):
 	@classmethod
 	def handle_category(self, args):
+		cur = self.conn.cursor()
 		sql = 'SELECT DISTINCT player_name FROM skynet_events;'
 		try:
 			self.cur.execute(sql)
 		except psycopg2.Error, e:
+			cur.close()
 			self.conn.rollback()
 			return e.pgerror
+
 		data = self.cur.fetchall()
+		cur.close()
 		toreturn = []
 		for field in data:
 			toreturn.append(field[0])
@@ -131,14 +141,17 @@ class players_handler(base_handler):
 
 	@classmethod
 	def handle_object(self, player, args):
+		cur = self.conn.cursor()
 		sql = 'SELECT * FROM skynet_events WHERE LOWER(player_name)=LOWER(%s) ORDER BY time ASC;'
 		try:
-			self.cur.execute(sql, (player,))
+			cur.execute(sql, (player,))
 		except psycopg2.Error, e:
+			cur.close()
 			self.conn.rollback()
 			return e.pgerror
-		
-		data = self.cur.fetchall()
+
+		cur.close()
+		data = cur.fetchall()
 		toreturn = []
 		#I'm sure this could be done in SQL but this way is simpler
 		length = len(data)-1
@@ -168,6 +181,7 @@ class online_handler(base_handler):
 	}
 	@classmethod
 	def handle_category(self, args):
+		cur = self.conn.cur()
 		params = []
 		if 'at' in args:
 			sql = skysql.online_at
@@ -191,10 +205,12 @@ class online_handler(base_handler):
 		try:
 			self.cur.execute(sql, params)
 		except psycopg2.Error, e:
+			cur.close()
 			self.conn.rollback()
 			return e.pgerror
 
 		data = self.cur.fetchall()
+		cur.close()
 		toreturn = {}
 		for field in data:
 			toreturn[field[0]]=field[1].isoformat()
