@@ -172,20 +172,20 @@ class online_handler(base_handler):
 		if 'at' in args:
 			sql = skysql.online_at
 			params.append(args['at'])
-		elif 'from' or 'until' in args:
-			sql ="""SELECT DISTINCT se1.player_name FROM (
-						SELECT player_name FROM skynet_events"""
-			first = True
-			for key, value in args.iteritems():
-				if key in self.argsql:
-					if not first:
-						sql+=' AND '+self.argsql[key]
-						params.append(value)
-					else:
-						sql+=' WHERE '+self.argsql[key]
-						params.append(value)
-						first = False
-			sql += ') se1;'
+		# elif 'from' or 'until' in args:
+		# 	sql ="""SELECT DISTINCT se1.player_name FROM (
+		# 				SELECT player_name FROM skynet_events"""
+		# 	first = True
+		# 	for key, value in args.iteritems():
+		# 		if key in self.argsql:
+		# 			if not first:
+		# 				sql+=' AND '+self.argsql[key]
+		# 				params.append(value)
+		# 			else:
+		# 				sql+=' WHERE '+self.argsql[key]
+		# 				params.append(value)
+		# 				first = False
+		# 	sql += ') se1;'
 		else:
 			sql = skysql.online_now
 		try:
