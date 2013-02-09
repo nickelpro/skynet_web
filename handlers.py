@@ -117,7 +117,7 @@ class events_handler(base_handler):
 class players_handler(base_handler):
 	@classmethod
 	def handle_category(self, args):
-		sql = 'SELECT DISTINCT player_name from skynet_events;'
+		sql = 'SELECT DISTINCT player_name FROM skynet_events;'
 		try:
 			self.cur.execute(sql)
 		except psycopg2.Error, e:
@@ -140,6 +140,7 @@ class players_handler(base_handler):
 		
 		data = self.cur.fetchall()
 		toreturn = []
+		#I'm sure this could be done in SQL but this way is simpler
 		length = len(data)-1
 		for index, field in enumerate(data):
 			if field[2]:
@@ -159,14 +160,35 @@ class players_handler(base_handler):
 					return str(e)
 		return toreturn
 
+@cat_handler('times')
+class
+
 @cat_handler('online')
 class online_handler(base_handler):
+	argsql = {
+		'from': 'time>=%s',
+		'until': 'time<=%s',
+	}
 	@classmethod
 	def handle_category(self, args):
 		params = []
 		if 'at' in args:
 			sql = skysql.online_at
 			params.append(args['at'])
+		elif 'from' or 'until' in args:
+			sql ="""SELECT DISTINCT se1.player_name FROM (
+						SELECT player_name FROM skynet_events"""
+			first = True
+			for key, value in args.iteritems():
+				if key in self.argsql:
+					if not first:
+						sql+=' AND '+self.argsql[key]
+						params.append(value)
+					else:
+						sql+=' WHERE '+self.argsql[key]
+						params.append(value)
+						first = False
+			sql += ') se1;'
 		else:
 			sql = skysql.online_now
 		try:
@@ -178,5 +200,5 @@ class online_handler(base_handler):
 		data = self.cur.fetchall()
 		toreturn = {}
 		for field in data:
-			toreturn[field[1]]=field[0].isoformat()
+			toreturn[field[0]]=field[1].isoformat()
 		return toreturn
