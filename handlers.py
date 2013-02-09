@@ -132,7 +132,7 @@ class players_handler(base_handler):
 			self.conn.rollback()
 			return e.pgerror
 
-		data = self.cur.fetchall()
+		data = cur.fetchall()
 		cur.close()
 		toreturn = []
 		for field in data:
