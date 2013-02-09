@@ -150,8 +150,8 @@ class players_handler(base_handler):
 			self.conn.rollback()
 			return e.pgerror
 
-		cur.close()
 		data = cur.fetchall()
+		cur.close()
 		toreturn = []
 		#I'm sure this could be done in SQL but this way is simpler
 		length = len(data)-1
