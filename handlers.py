@@ -223,7 +223,7 @@ class times_handler(base_handler):
 							toreturn += time
 				except ValueError, e:
 					return str(e)
-		return toreturn
+		return str(toreturn)
 
 
 @cat_handler('online')
