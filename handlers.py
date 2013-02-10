@@ -170,7 +170,7 @@ class players_handler(base_handler):
 								'online_time': str(time),
 							})
 				except ValueError, e:
-					return (str(e),)
+					return [str(e),]
 		return toreturn
 
 #Similar to players, but provides total session information
