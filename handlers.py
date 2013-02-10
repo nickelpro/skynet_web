@@ -255,7 +255,6 @@ class online_handler(base_handler):
 		else:
 			sql = skysql.online_now
 		try:
-			return sql
 			cur.execute(sql, params)
 		except psycopg2.Error, e:
 			cur.close()
