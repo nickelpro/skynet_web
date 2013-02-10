@@ -173,6 +173,59 @@ class players_handler(base_handler):
 					return str(e)
 		return toreturn
 
+#Similar to players, but provides total session information
+@cat_handler('times')
+class times_handler(base_handler):
+	@classmethod
+	def handle_category(self, args):
+		cur = self.conn.cursor()
+		sql = 'SELECT DISTINCT player_name FROM skynet_events;'
+		try:
+			cur.execute(sql)
+		except psycopg2.Error, e:
+			cur.close()
+			self.conn.rollback()
+			return e.pgerror
+
+		data = cur.fetchall()
+		cur.close()
+		toreturn = []
+		for field in data:
+			toreturn.append(field[0])
+		return toreturn
+
+	@classmethod
+	def handle_object(self, player, args):
+		cur = self.conn.cursor()
+		sql = 'SELECT * FROM skynet_events WHERE LOWER(player_name)=LOWER(%s) ORDER BY time ASC;'
+		try:
+			cur.execute(sql, (player,))
+		except psycopg2.Error, e:
+			cur.close()
+			self.conn.rollback()
+			return e.pgerror
+
+		data = cur.fetchall()
+		cur.close()
+		toreturn = datetime.timedelta()
+		#I'm sure this could be done in SQL but this way is simpler
+		length = len(data)-1
+		for index, field in enumerate(data):
+			if field[2]:
+				index+=1
+				while index<=length and data[index][2]:
+					data.pop(index)
+					length-=1
+				time = (data[index][3] - field[3]) if index<=length else (datetime.datetime.now(pytz.utc)-field[3])
+				try:
+					if not 'until' in args or datetimeparse(args['until'])>=field[3]:
+						if not 'from' in args or datetimeparse(args['from'])<=field[3]:
+							toreturn += time
+				except ValueError, e:
+					return str(e)
+		return toreturn
+
+
 @cat_handler('online')
 class online_handler(base_handler):
 	argsql = {
@@ -186,20 +239,19 @@ class online_handler(base_handler):
 		if 'at' in args:
 			sql = skysql.online_at
 			params.append(args['at'])
-		# elif 'from' or 'until' in args:
-		# 	sql ="""SELECT DISTINCT se1.player_name FROM (
-		# 				SELECT player_name FROM skynet_events"""
-		# 	first = True
-		# 	for key, value in args.iteritems():
-		# 		if key in self.argsql:
-		# 			if not first:
-		# 				sql+=' AND '+self.argsql[key]
-		# 				params.append(value)
-		# 			else:
-		# 				sql+=' WHERE '+self.argsql[key]
-		# 				params.append(value)
-		# 				first = False
-		# 	sql += ') se1;'
+		elif 'from' or 'until' in args:
+			sql = 'SELECT DISTINCT player_name, time FROM skynet_events'
+		 	first = True
+		 	for key, value in args.iteritems():
+		 		if key in self.argsql:
+		 			if not first:
+		 				sql+=' AND '+self.argsql[key]
+		 				params.append(value)
+		 			else:
+		 				sql+=' WHERE '+self.argsql[key]
+		 				params.append(value)
+		 				first = False
+		 	sql += ') se1;'
 		else:
 			sql = skysql.online_now
 		try:
