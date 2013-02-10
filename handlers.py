@@ -236,7 +236,6 @@ class online_handler(base_handler):
 	def handle_category(self, args):
 		cur = self.conn.cursor()
 		params = []
-		return args
 		if 'at' in args:
 			sql = skysql.online_at
 			params.append(args['at'])
