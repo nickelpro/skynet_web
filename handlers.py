@@ -239,7 +239,7 @@ class online_handler(base_handler):
 		if 'at' in args:
 			sql = skysql.online_at
 			params.append(args['at'])
-		elif 'from' or 'until' in args:
+		elif ('from' in args) or ('until' in args):
 			sql = 'SELECT DISTINCT player_name, time FROM skynet_events'
 		 	first = True
 		 	for key, value in args.iteritems():
