@@ -34,6 +34,8 @@ class category_handler:
 		args = web.input()
 		if category in categories and returntype in returntypes:
 			web.header('Content-Type', ctypes[returntype])
+			web.header('Access-Control-Allow-Origin', '*')
+			web.header('Access-Control-Allow-Credentials', 'true')
 			return returntypes[returntype](categories[category].handle_category(args))
 		else:
 			return web.NotFound()
@@ -43,6 +45,8 @@ class object_handler:
 		args = web.input()
 		if category in categories and returntype in returntypes:
 			web.header('Content-Type', ctypes[returntype])
+			web.header('Access-Control-Allow-Origin', '*')
+			web.header('Access-Control-Allow-Credentials', 'true')
 			return returntypes[returntype](categories[category].handle_object(obj, args))
 		else:
 			return web.NotFound()
