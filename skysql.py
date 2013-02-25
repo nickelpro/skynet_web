@@ -31,7 +31,7 @@ online_at = """
 WITH at_time AS (
 	SELECT time, player_name, online FROM skynet_events WHERE time<=%s
 ),
-WITH online_players AS (
+online_players AS (
 	SELECT se1.player_name, se1.time, se1.online FROM at_time se1 INNER JOIN (
 		SELECT MAX(time) AS time, player_name FROM at_time GROUP BY player_name
 	) se2 ON (se1.player_name = se2.player_name AND se1.time = se2.time AND se1.online = True)
