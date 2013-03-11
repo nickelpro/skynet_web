@@ -94,7 +94,7 @@ class events_handler(base_handler):
 
 		data = cur.fetchall()
 		cur.close()
-		conn.commit()
+		self.conn.commit()
 		toreturn = []
 		for field in data:
 			toreturn.append({
@@ -118,7 +118,7 @@ class events_handler(base_handler):
 
 		data = cur.fetchall()[0]
 		cur.close()
-		conn.commit()
+		self.conn.commit()
 		return {
 			'id':data[0],
 			'player':data[1],
@@ -141,7 +141,7 @@ class players_handler(base_handler):
 
 		data = cur.fetchall()
 		cur.close()
-		conn.commit()
+		self.conn.commit()
 		toreturn = []
 		for field in data:
 			toreturn.append(field[0])
@@ -160,7 +160,7 @@ class players_handler(base_handler):
 
 		data = cur.fetchall()
 		cur.close()
-		conn.commit()
+		self.conn.commit()
 		toreturn = []
 		#I'm sure this could be done in SQL but this way is simpler
 		length = len(data)-1
@@ -216,7 +216,7 @@ class times_handler(base_handler):
 
 		data = cur.fetchall()
 		cur.close()
-		conn.commit()
+		self.conn.commit()
 		toreturn = datetime.timedelta()
 		#I'm sure this could be done in SQL but this way is simpler
 		length = len(data)-1
@@ -273,7 +273,7 @@ class online_handler(base_handler):
 
 		data = cur.fetchall()
 		cur.close()
-		conn.commit()
+		self.conn.commit()
 		toreturn = {}
 		for field in data:
 			toreturn[field[0]]=field[1].isoformat()
@@ -314,7 +314,7 @@ class stats_handler(base_handler):
 
 		data = cur.fetchall()
 		cur.close()
-		conn.commit()
+		self.conn.commit()
 		toreturn = []
 		for field in data:
 			toreturn.append({
@@ -354,7 +354,7 @@ class stats_handler(base_handler):
 
 		data = cur.fetchall()[0]
 		cur.close()
-		conn.commit()
+		self.conn.commit()
 		return {
 			'uid': data[0],
 			'Time': data[1].isoformat(),
