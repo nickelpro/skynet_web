@@ -283,7 +283,7 @@ class stats_handler(base_handler):
 		cur = self.conn.cursor()
 		params = []
 		if 'at' in args:
-			sql = 'SELECT * FROM skynet_stats WHERE "Time"<=%s ORDER BY "Time" ASC;'
+			sql = 'SELECT * FROM skynet_stats WHERE "Time"<=%s ORDER BY "Time" DESC;'
 			params.append(args['at'])
 		else:
 			sql = 'SELECT * FROM skynet_stats'
