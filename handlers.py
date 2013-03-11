@@ -271,3 +271,95 @@ class online_handler(base_handler):
 		for field in data:
 			toreturn[field[0]]=field[1].isoformat()
 		return toreturn
+
+@cat_handler('stats')
+class stats_handler(base_handler):
+	argsql = {
+		'from': '"Time">=%s',
+		'until': '"Time"<=%s',
+	}
+	@classmethod
+	def handle_category(self, args):
+		cur = self.conn.cursor()
+		params = []
+		if 'at' in args:
+			sql = 'SELECT * FROM skynet_stats WHERE "Time"<=%s ORDER BY "Time" ASC;'
+			params.append(args['at'])
+		else:
+			sql = 'SELECT * FROM skynet_stats'
+			first = True
+			for key, value in args.iteritems():
+				if key in self.argsql:
+					if not first:
+						sql+=' AND '+self.argsql[key]
+						params.append(value)
+					else:
+						sql+=' WHERE '+self.argsql[key]
+						params.append(value)
+						first = False
+		try:
+			cur.execute(sql, params)
+		except psycopg2.Error, e:
+			cur.close()
+			self.conn.rollback()
+			return e.pgerror
+
+		data = cur.fetchall()
+		cur.close()
+		toreturn = []
+		for field in data:
+			toreturn.append({
+				'uid': field[0],
+				'Time': field[1].isoformat(),
+				'UsedMem': field[2],
+				'TotalMem': field[3],
+				'MemUnit': field[4],
+				'Tps': field[5],
+				'PercentTps': field[6],
+				'LoadedChunks': field[7],
+				'UnLoadedChunks': field[8],
+				'LightingChunks': field[9],
+				'TotalEntities': field[10],
+				'Mobs': field[11],
+				'Items': field[12],
+				'TNT': field[13],
+				'Players': field[14],
+				'PacketCompr': field[15],
+			})
+		if 'at' in args:
+			return toreturn[0]
+		return toreturn
+
+	@classmethod
+	def handle_object(self, uid, args):
+		cur = self.conn.cursor()
+		sql = 'SELECT * FROM skynet_stats WHERE uid=%s;'
+		if not uid.isdigit():
+			return {}
+		try:
+			cur.execute(sql, (uid,))
+		except psycopg2.Error, e:
+			cur.close()
+			self.conn.rollback()
+			return e.pgerror
+
+		data = cur.fetchall()[0]
+		cur.close()
+		return {
+			'uid': data[0],
+			'Time': data[1].isoformat(),
+			'UsedMem': data[2],
+			'TotalMem': data[3],
+			'MemUnit': data[4],
+			'Tps': data[5],
+			'PercentTps': data[6],
+			'LoadedChunks': data[7],
+			'UnLoadedChunks': data[8],
+			'LightingChunks': data[9],
+			'TotalEntities': data[10],
+			'Mobs': data[11],
+			'Items': data[12],
+			'TNT': data[13],
+			'Players': data[14],
+			'PacketCompr': data[15],
+		}
