@@ -11,4 +11,9 @@ cur.execute("""SELECT se1.player_name, se1.time, se1.online FROM skynet_events s
 
 data = cur.fetchall()
 conn.commit()
-print data
+for field in data:
+	cur.execute("""INSERT INTO skynet_events (player_name, online, time) VALUES (%s, %s, NOW());""", 
+		(field[0], False,))
+	conn.commit()
+cur.close()
+conn.close()
