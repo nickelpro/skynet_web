@@ -45,7 +45,10 @@ ctypes = {
 
 class root_handler:
 	def GET(self, *args):
-		return endpoints
+		web.header('Content-Type', ctypes['json'])
+		web.header('Access-Control-Allow-Origin', '*')
+		web.header('Access-Control-Allow-Credentials', 'true')
+		return returntypes['json'](endpoints)
 
 class category_handler:
 	def GET(self, category, returntype='json'):
