@@ -9,10 +9,10 @@ from dblogin import dbname, dbuser, dbpass
 
 endpoints = {
 	"about": {
-		"what": "Civcraft SkyNet"
-		"version": "1.0dev"
-		"contact": "nickelpro@gmail.com"
-	}
+		"what": "Civcraft SkyNet",
+		"version": "1.0dev",
+		"contact": "nickelpro@gmail.com",
+	},
 	"endpoints": []
 }
 
