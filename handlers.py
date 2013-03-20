@@ -24,7 +24,6 @@ def cat_handler(category, cat_object = ''):
 		categories[category] = cl
 		endpoints['endpoints'].append(endpoint)
 		if cat_object:
-			categories[category] = {'cat_object': cat_object}
 			endpoints['endpoints'].append(endpoint+"/"+cat_object)
 		return cl
 	return inner
