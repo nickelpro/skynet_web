@@ -57,7 +57,7 @@ class category_handler:
 			web.header('Access-Control-Allow-Credentials', 'true')
 			return returntypes[returntype](categories[category].handle_category(args))
 		else:
-			return web.NotFound()
+			raise web.NotFound()
 
 class object_handler:
 	def GET(self, category, obj, returntype='json'):
@@ -68,16 +68,16 @@ class object_handler:
 			web.header('Access-Control-Allow-Credentials', 'true')
 			return returntypes[returntype](categories[category].handle_object(obj, args))
 		else:
-			return web.NotFound()
+			raise web.NotFound()
 
 class base_handler:
 	conn = psycopg2.connect(database=dbname, user=dbuser, password=dbpass)
 	@classmethod
 	def handle_category(self, args):
-		return web.NotFound()
+		raise web.NotFound()
 	@classmethod
 	def handle_object(self, obj, args):
-		return web.NotFound()
+		raise web.NotFound()
 
 @cat_handler('events', '[eventid]')
 class events_handler(base_handler):
