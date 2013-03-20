@@ -1,12 +1,12 @@
 import web
-from handlers import category_handler, object_handler
+from handlers import root_handler, category_handler, object_handler
 
 class hello:
 	def GET(self, *args):
 		return "Hello"
 
 mapping = (
-	('/', 'hello'), 
+	('/', 'endpoints'), 
 	('/([a-zA-Z0-9_]*)', 'category_handler'),
 	('/([a-zA-Z0-9_]*)\.([a-zA-Z0-9_]*)', 'category_handler'),
 	('/([a-zA-Z0-9_]*)/([a-zA-Z0-9_]*)', 'object_handler'),
@@ -14,7 +14,7 @@ mapping = (
 	)
 
 fvars = {
-	'hello': hello,
+	'endpoints': root_handler,
 	'category_handler': category_handler,
 	'object_handler': object_handler,
 	}

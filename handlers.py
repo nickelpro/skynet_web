@@ -7,11 +7,25 @@ import skysql
 from dateutil.parser import parse as datetimeparse
 from dblogin import dbname, dbuser, dbpass
 
+endpoints = {
+	"about": {
+		"what": "Civcraft SkyNet"
+		"version": "1.0dev"
+		"contact": "nickelpro@gmail.com"
+	}
+	"endpoints": []
+}
+
 categories = {}
 #The temptation to name this cat_herder was extraordinary
-def cat_handler(category):
+def cat_handler(category, cat_object = ''):
 	def inner(cl):
+		endpoint = "get::/" + category
 		categories[category] = cl
+		endpoints['endpoints'].append(endpoint)
+		if cat_object:
+			categories[category] = {'cat_object': cat_object}
+			endpoints['endpoints'].append(endpoint+"/"+cat_object)
 		return cl
 	return inner
 
@@ -29,6 +43,10 @@ ctypes = {
 	'yml': 'text/x-yaml',
 	'xml': 'application/xml',
 }
+
+class root_handler:
+	def GET(self, *args):
+		return endpoints
 
 class category_handler:
 	def GET(self, category, returntype='json'):
@@ -61,7 +79,7 @@ class base_handler:
 	def handle_object(self, obj, args):
 		return web.NotFound()
 
-@cat_handler('events')
+@cat_handler('events', '[eventid]')
 class events_handler(base_handler):
 	argsql = {
 		'from': 'time>=%s',
@@ -126,7 +144,7 @@ class events_handler(base_handler):
 			'time': data[3].isoformat(),
 		}
 
-@cat_handler('players')
+@cat_handler('players', '[player_name]')
 class players_handler(base_handler):
 	@classmethod
 	def handle_category(self, args):
@@ -183,7 +201,6 @@ class players_handler(base_handler):
 		return toreturn
 
 #Similar to players, but provides total session information
-@cat_handler('times')
 class times_handler(base_handler):
 	@classmethod
 	def handle_category(self, args):
@@ -279,7 +296,7 @@ class online_handler(base_handler):
 			toreturn[field[0]]=field[1].isoformat()
 		return toreturn
 
-@cat_handler('stats')
+@cat_handler('stats', '[uid]')
 class stats_handler(base_handler):
 	argsql = {
 		'from': '"Time">=%s',
